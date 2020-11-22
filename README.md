@@ -2,6 +2,19 @@
 
 Builders are tools that aid in setting properties of controls on a form. Unlike wizards, builders are reentrant, so you can reopen a builder on a particular control repeatedly. Visual FoxPro includes a number of generic builders for many of the common form controls including grids, list boxes, combo boxes, check boxes, command groups, and option groups.
 
+**Builder.APP**: v2.1 (September 8, 2020 update)
+* One “ALL” builder with no other registered builders no longer automatically runs. 
+* The pick list dialog for the builders is now resizable with anchoring.
+* Form is larger to display more builders and more descriptive names.
+* Description shows more text and is no longer has textbox like attributes.
+* The type of builder is now displayed on the form so you can tell if it is a “natural” builder or “ALL” builder.
+* The builders are now sorted so the “natural” builders show up before the “ALL” builders in the list, then alphabetically.
+* Segoe UI font to look more modern.
+* Version of Builder.APP is now displayed.
+* Name of the registration table with the pathed location.
+* VFPX-powered image.
+
+**Builders:**
 * Application Builder: Displays a tabbed dialog box to simplify creating and modifying forms, complex controls, and other optional elements of effective and satisfying applications.
 
 * AutoFormat Builder: Allows you to apply a set of styles to selected controls of the same type.
