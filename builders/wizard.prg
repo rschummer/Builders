@@ -41,7 +41,16 @@ IF NOT 'WBMAIN' $ SET("PROCEDURE")
 	SET PROCEDURE TO WBMAIN ADDITIVE				&& main wizard/builder class library
 ENDIF
 
-m.wbcWizVer = " version .071"
+* RAS 08-Sep-2020, the Wizards sometimes require the Wizards.FLL. If you move your registration table to another folder
+* the process cannot find the FLL. Adding the folder to the path should solve that issue.
+lcWizardFolder = ADDBS(HOME())+ "Wizards"
+
+SET PATH TO "&lcWizardFolder" ADDITIVE 
+
+*< RAS 8-Sep-2020, updated Version to the class.
+*< m.wbcWizVer = " version .071"
+m.wbcWizVer = " v2.1 (September 8, 2020)"
+
 m.wblError = .f.
 m.wbReturnValue = ""
 

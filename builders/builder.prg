@@ -46,7 +46,9 @@ m.wbOptionalParms = parameters() - 4				&& first 4 are known parameters, remaind
 
 tcRunBuilder=wbcpClass
 
-m.wbcBldVer = " version .078"
+*< RAS 26-Jun-2020, updated Version to the class.
+*< m.wbcBldVer = " version .078"
+m.wbcBldVer = " v2.1 (September 8, 2020)"
 
 m.wbStartingProc = SET("PROCEDURE")
 
@@ -399,7 +401,7 @@ DEFINE CLASS Builder AS WizBldr		&& WizBldr class is defined in the WB.PRG libra
 
 	m.wbcType = "BUILDER"					&& do not localize
 	m.wbcTypeDisplay = C_BUILDER_LOC		&& this line is localizable, defined at top of this file
-
+   
 ENDDEFINE
 
 

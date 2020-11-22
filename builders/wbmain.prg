@@ -597,75 +597,172 @@ DEFINE CLASS WizBldr AS CUSTOM
 	ENDPROC
 
 
-	PROCEDURE WBDoSelect
-	* Suppress "auto" wizard types unless they're being explicitly asked for by the product
-	* ----------------------------------------------------------------------------
-		PARAMETER wbcSelectCode
-		LOCAL lnDataCompat
-		lnDataCompat=SYS(3099)
-		SYS(3099,70)
-		DO CASE
-			CASE m.wbcSelectCode == "NAMEDFILE"
-		  																		&& in program field
-				SELECT name, descript, bitmap, type, program, ;
-					classlib, classname, parms ;
-					FROM _wbregtbl_ ;
-					WHERE UPPER(m.wbcpName) $ UPPER(program) OR UPPER(type) = C_ALL  ;
-					INTO ARRAY THIS.wbaAllData ;
-					ORDER BY name ;
-					GROUP BY name
-				IF _tally = 0													&& if no program, look in classname field
-					SELECT name, descript, bitmap, type, program, ;
-						classlib, classname, parms ;
-						FROM _wbregtbl_ ;
-						WHERE UPPER(m.wbcpName) = UPPER(classname) OR UPPER(type) = C_ALL ;
-						INTO ARRAY THIS.wbaAllData ;
-						ORDER BY name ;
-						GROUP BY name
-				ENDIF
-			
-			CASE m.wbcSelectCode == "NAMEDCLASS" OR m.wbcSelectCode == "CLASS" OR m.wbcSelectCode == "BASECLASS"
-				DO CASE
-					CASE m.wbcSelectCode == "NAMEDCLASS"
-						m.wbcThisclass = THIS.wbcNamedClass
-					CASE m.wbcSelectCode == "CLASS"
-						m.wbcThisclass = THIS.wbcClass
-					CASE m.wbcSelectCode == "BASECLASS"
-						m.wbcThisclass = THIS.wbcBaseClass
-				ENDCASE
-				
-				IF LEFT(UPPER(m.wbcThisclass),4) = "AUTO"
-					SELECT name, descript, bitmap, type, program, ;
-						classlib, classname, parms ;
-						FROM _wbregtbl_ ;
-						WHERE upper(type) = upper(m.wbcThisclass) OR UPPER(type) = C_ALL ;
-						INTO ARRAY THIS.wbaAllData ;
-						ORDER BY name ;
-						GROUP BY name
-			ELSE
-					SELECT name, descript, bitmap, type, program, ;
-						classlib, classname, parms ;
-						FROM _wbregtbl_ ;
-						WHERE (UPPER(type) = UPPER(m.wbcThisclass) OR UPPER(type) = C_ALL) AND LEFT(UPPER(type),4) <> "AUTO" ;
-						INTO ARRAY THIS.wbaAllData ;
-						ORDER BY name ;
-						GROUP BY name
-			ENDIF
+*<   	PROCEDURE WBDoSelect
+*<   	* Suppress "auto" wizard types unless they're being explicitly asked for by the product
+*<   	* ----------------------------------------------------------------------------
+*<   		PARAMETER wbcSelectCode
+*<   		LOCAL lnDataCompat
+*<         
+*<   		lnDataCompat=SYS(3099)
+*<   		SYS(3099,70)
+*<   		
+*<         DO CASE
+*<   			CASE m.wbcSelectCode == "NAMEDFILE"
+*<   		  																		&& in program field
+*<   				SELECT name, descript, bitmap, type, program, ;
+*<   					    classlib, classname, parms ;
+*<   					FROM _wbregtbl_ ;
+*<   					WHERE UPPER(m.wbcpName) $ UPPER(program) OR UPPER(type) = C_ALL  ;
+*<   					INTO ARRAY THIS.wbaAllData ;
+*<   					ORDER BY name ;
+*<   					GROUP BY name
+*<   				
+*<               IF _tally = 0													&& if no program, look in classname field
+*<   					SELECT name, descript, bitmap, type, program, ;
+*<   						classlib, classname, parms ;
+*<   						FROM _wbregtbl_ ;
+*<   						WHERE UPPER(m.wbcpName) = UPPER(classname) OR UPPER(type) = C_ALL ;
+*<   						INTO ARRAY THIS.wbaAllData ;
+*<   						ORDER BY name ;
+*<   						GROUP BY name
+*<   				ENDIF
+*<   			
+*<   			CASE m.wbcSelectCode == "NAMEDCLASS" OR m.wbcSelectCode == "CLASS" OR m.wbcSelectCode == "BASECLASS"
+*<   				DO CASE
+*<   					CASE m.wbcSelectCode == "NAMEDCLASS"
+*<   						m.wbcThisclass = THIS.wbcNamedClass
+*<   					CASE m.wbcSelectCode == "CLASS"
+*<   						m.wbcThisclass = THIS.wbcClass
+*<   					CASE m.wbcSelectCode == "BASECLASS"
+*<   						m.wbcThisclass = THIS.wbcBaseClass
+*<   				ENDCASE
+*<   				
+*<   				IF LEFT(UPPER(m.wbcThisclass),4) = "AUTO"
+*<   					SELECT name, descript, bitmap, type, program, ;
+*<   						    classlib, classname, parms ;
+*<   						FROM _wbregtbl_ ;
+*<   						WHERE upper(type) = upper(m.wbcThisclass) OR UPPER(type) = C_ALL ;
+*<   						INTO ARRAY THIS.wbaAllData ;
+*<   						ORDER BY name ;
+*<   						GROUP BY name
+*<   			   ELSE
+*<   					SELECT name, descript, bitmap, type, program, ;
+*<   						    classlib, classname, parms ;
+*<   						FROM _wbregtbl_ ;
+*<   						WHERE (UPPER(type) = UPPER(m.wbcThisclass) OR UPPER(type) = C_ALL) AND LEFT(UPPER(type),4) <> "AUTO" ;
+*<   						INTO ARRAY THIS.wbaAllData ;
+*<   						ORDER BY name ;
+*<   						GROUP BY name
+*<   			   ENDIF
 
-			OTHERWISE															&& otherwise take all entries
-				SELECT name, descript, bitmap, type, program, ;
-					classlib, classname, parms ;
-				FROM _wbregtbl_ ;
-				WHERE LEFT(UPPER(type),4) <> "AUTO" OR UPPER(type) = C_ALL  ;
-				INTO ARRAY THIS.wbaAllData ;
-				ORDER BY name ;
-				GROUP BY name
-		ENDCASE
-		SYS(3099,lnDataCompat)
-		
-		RETURN _TALLY
+*<   			OTHERWISE															&& otherwise take all entries
+*<   				SELECT name, descript, bitmap, type, program, ;
+*<   					    classlib, classname, parms ;
+*<      				FROM _wbregtbl_ ;
+*<      				WHERE LEFT(UPPER(type),4) <> "AUTO" OR UPPER(type) = C_ALL  ;
+*<      				INTO ARRAY THIS.wbaAllData ;
+*<      				ORDER BY name ;
+*<      				GROUP BY name
+*<   		ENDCASE
+*<   		
+*<         SYS(3099,lnDataCompat)
+*<   		
+*<   		RETURN _TALLY
 
-	ENDPROC
+*<   	ENDPROC
+
+   PROCEDURE WBDoSelect
+   * Suppress "auto" wizard types unless they're being explicitly asked for by the product
+   * ----------------------------------------------------------------------------
+      PARAMETER wbcSelectCode
+      LOCAL lnDataCompat
+      
+      * RAS 27-Jun-2020, Added ninth column for sorting the list. It pushes "ALL" builders to the 
+      * bottom so the "natural" builders for the object are at the top. Builders are still alphabetically
+      * sorted withing the natural and ALL builders in the list.
+      DIMENSION wbaSomeData[1,9]
+      
+      lnDataCompat=SYS(3099)
+      SYS(3099,70)
+      
+      DO CASE
+         CASE m.wbcSelectCode == "NAMEDFILE"
+                                                              && in program field
+            SELECT name, descript, bitmap, type, program, ;
+                   classlib, classname, parms, IIF(UPPER(type) = C_ALL, "z", "a") AS cSort ;
+               FROM _wbregtbl_ ;
+               WHERE UPPER(m.wbcpName) $ UPPER(program) OR UPPER(type) = C_ALL  ;
+               INTO ARRAY wbaSomeData ;
+               ORDER BY cSort, name ;
+               GROUP BY name
+            
+            IF _tally = 0                                       && if no program, look in classname field
+               SELECT name, descript, bitmap, type, program, ;
+                  classlib, classname, parms, IIF(UPPER(type) = C_ALL, "z", "a") AS cSort ;
+                  FROM _wbregtbl_ ;
+                  WHERE UPPER(m.wbcpName) = UPPER(classname) OR UPPER(type) = C_ALL ;
+                  INTO ARRAY wbaSomeData ;
+                  ORDER BY cSort, name ;
+                  GROUP BY name
+            ENDIF
+         
+         CASE m.wbcSelectCode == "NAMEDCLASS" OR m.wbcSelectCode == "CLASS" OR m.wbcSelectCode == "BASECLASS"
+            DO CASE
+               CASE m.wbcSelectCode == "NAMEDCLASS"
+                  m.wbcThisclass = THIS.wbcNamedClass
+               CASE m.wbcSelectCode == "CLASS"
+                  m.wbcThisclass = THIS.wbcClass
+               CASE m.wbcSelectCode == "BASECLASS"
+                  m.wbcThisclass = THIS.wbcBaseClass
+            ENDCASE
+            
+            IF LEFT(UPPER(m.wbcThisclass),4) = "AUTO"
+               SELECT name, descript, bitmap, type, program, ;
+                      classlib, classname, parms, IIF(UPPER(type) = C_ALL, "z", "a") AS cSort ;
+                  FROM _wbregtbl_ ;
+                  WHERE upper(type) = upper(m.wbcThisclass) OR UPPER(type) = C_ALL ;
+                  INTO ARRAY wbaSomeData ;
+                  ORDER BY cSort, name ;
+                  GROUP BY name
+            ELSE
+               SELECT name, descript, bitmap, type, program, ;
+                      classlib, classname, parms, IIF(UPPER(type) = C_ALL, "z", "a") AS cSort ;
+                  FROM _wbregtbl_ ;
+                  WHERE (UPPER(type) = UPPER(m.wbcThisclass) OR UPPER(type) = C_ALL) AND LEFT(UPPER(type),4) <> "AUTO" ;
+                  INTO ARRAY wbaSomeData ;
+                  ORDER BY cSort, name ;
+                  GROUP BY name
+            ENDIF
+
+         OTHERWISE                                             && otherwise take all entries
+            SELECT name, descript, bitmap, type, program, ;
+                   classlib, classname, parms, IIF(UPPER(type) = C_ALL, "z", "a") AS cSort ;
+               FROM _wbregtbl_ ;
+               WHERE LEFT(UPPER(type),4) <> "AUTO" OR UPPER(type) = C_ALL  ;
+               INTO ARRAY wbaSomeData ;
+               ORDER BY cSort, name ;
+               GROUP BY name
+      ENDCASE
+      
+      * Dimension the array linked for listing the wizards and builders, then blank it out.
+      DIMENSION THIS.wbaAllData[ALEN(wbaSomeData, 1), 8]
+      
+      THIS.wbaAllData = SPACE(0)
+
+      * Move over the collected columns, but skip the sorting column that pushes 
+      * "ALL" builders towards the bottom of the list. Keeps compatibility with 
+      * any code that is counting on the 8 columns originally used by the class.
+      FOR lnI = 1 TO ALEN(wbaSomeData, 1)
+         FOR lnJ = 1 TO 8
+            THIS.wbaAllData[m.lnI, m.lnJ] = wbaSomeData[m.lnI, m.lnJ]
+         ENDFOR 
+      ENDFOR 
+
+      SYS(3099,lnDataCompat)
+      
+      RETURN _TALLY
+
+   ENDPROC
 
 	PROCEDURE WBGetName
 	* ----------------------------------------------------------------------------
@@ -679,7 +776,16 @@ DEFINE CLASS WizBldr AS CUSTOM
 		m.wblUserLib = .f.
 
 		* one and only one entry found
-		IF ALEN(THIS.wbaAllData,1) = 1 and NOT EMPTY(THIS.wbaAllData[1,1])
+      
+      *< RAS 26-Jun-2020, Fixing scenario where only builder available is "ALL" builder.
+      *< We do not automatically want a single "ALL" builder to run automatically. Force 
+      *< the Builder PickList dialog to be presented instead. 
+      *<
+      *< The columns of the wbaAllData array:
+      *<    1) name, 2) descript, 3) bitmap, 4) type, 5) program, 6) classlib, 7) classname, 8) parms
+      
+		*< IF ALEN(THIS.wbaAllData,1) = 1 and NOT EMPTY(THIS.wbaAllData[1,1])
+      IF ALEN(THIS.wbaAllData,1) = 1 and NOT EMPTY(THIS.wbaAllData[1,1]) AND UPPER(THIS.wbaAllData[1,4]) # C_ALL
 			m.wbiSlot = 1
 		ELSE
 			m.wbiSlot = THIS.WBNameSelect()		&& pick list, returns slot of desired entry in wbaAllData[]
